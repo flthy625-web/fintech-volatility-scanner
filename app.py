@@ -677,13 +677,15 @@ def render_binance_table(df: pd.DataFrame) -> None:
         return
 
     def _color_change(val: float) -> str:
+        """涨跌幅颜色：正数绿色背景，负数红色背景"""
         if val > 0:
-            return "color: #5eead4;"
+            return "background-color: rgba(94, 234, 212, 0.2); color: #10b981; font-weight: 600;"
         elif val < 0:
-            return "color: #f87171;"
+            return "background-color: rgba(248, 113, 113, 0.2); color: #ef4444; font-weight: 600;"
         return "color: #8a95c4;"
 
     def _color_status(val: str) -> str:
+        """波动状态颜色"""
         if "放量上涨" in val:
             return "background-color: rgba(94, 234, 212, 0.25); color: #5eead4; font-weight: 600;"
         elif "缩量背离" in val:
