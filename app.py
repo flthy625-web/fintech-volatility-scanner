@@ -166,6 +166,14 @@ REALTIME_REFRESH_INTERVAL = 30  # 秒
 BINANCE_API_BASE = "https://api.binance.com"
 BINANCE_24H_TICKER = f"{BINANCE_API_BASE}/api/v3/ticker/24hr"
 
+# 备用 API 端点（按优先级排序）
+BINANCE_API_ENDPOINTS = [
+    "https://api.binance.com/api/v3/ticker/24hr",
+    "https://api1.binance.com/api/v3/ticker/24hr",
+    "https://api2.binance.com/api/v3/ticker/24hr",
+    "https://api3.binance.com/api/v3/ticker/24hr",
+]
+
 
 # ---------------------------------------------------------------------------
 # 数据结构
@@ -311,38 +319,67 @@ def scan_universe(
 
 @st.cache_data(ttl=60, show_spinner=False)
 def fetch_binance_usdt_pairs() -> list[BinanceTicker]:
-    """获取所有 USDT 交易对的 24h 数据"""
-    try:
-        response = requests.get(BINANCE_24H_TICKER, timeout=10)
-        response.raise_for_status()
-        data = response.json()
+    """获取所有 USDT 交易对的 24h 数据，支持多个备用端点"""
+    data = None
+    last_error = None
 
-        tickers: list[BinanceTicker] = []
-        for item in data:
-            symbol = item.get("symbol", "")
-            # 只保留 USDT 交易对
-            if not symbol.endswith("USDT"):
+    # 尝试所有备用端点
+    for endpoint in BINANCE_API_ENDPOINTS:
+        try:
+            response = requests.get(
+                endpoint,
+                timeout=10,
+                headers={"User-Agent": "Mozilla/5.0"}
+            )
+
+            # 如果遇到 451 地区限制错误，尝试下一个端点
+            if response.status_code == 451:
+                last_error = f"端点 {endpoint} 地区受限 (HTTP 451)"
                 continue
 
-            try:
-                ticker = BinanceTicker(
-                    symbol=symbol,
-                    last_price=float(item.get("lastPrice", 0)),
-                    price_change_pct=float(item.get("priceChangePercent", 0)),
-                    high_24h=float(item.get("highPrice", 0)),
-                    low_24h=float(item.get("lowPrice", 0)),
-                    volume_24h=float(item.get("volume", 0)),
-                    quote_volume_24h=float(item.get("quoteVolume", 0)),
-                    trades_count=int(item.get("count", 0)),
-                )
-                tickers.append(ticker)
-            except (ValueError, TypeError):
-                continue
+            response.raise_for_status()
+            data = response.json()
+            break  # 成功获取数据，退出循环
 
-        return tickers
-    except requests.RequestException as e:
-        st.error(f"Binance API 请求失败: {e}")
+        except requests.RequestException as e:
+            last_error = str(e)
+            continue
+
+    # 如果所有端点都失败
+    if data is None:
+        st.error(
+            f"⚠️ Binance API 无法访问（可能是地区限制 HTTP 451）\n\n"
+            f"错误详情: {last_error}\n\n"
+            f"**解决方案：**\n"
+            f"1. 使用 VPN 切换到其他地区（如美国、日本、新加坡）\n"
+            f"2. 在 Streamlit Cloud 部署后访问（云端服务器通常无地区限制）\n"
+            f"3. 使用代理服务器"
+        )
         return []
+
+    tickers: list[BinanceTicker] = []
+    for item in data:
+        symbol = item.get("symbol", "")
+        # 只保留 USDT 交易对
+        if not symbol.endswith("USDT"):
+            continue
+
+        try:
+            ticker = BinanceTicker(
+                symbol=symbol,
+                last_price=float(item.get("lastPrice", 0)),
+                price_change_pct=float(item.get("priceChangePercent", 0)),
+                high_24h=float(item.get("highPrice", 0)),
+                low_24h=float(item.get("lowPrice", 0)),
+                volume_24h=float(item.get("volume", 0)),
+                quote_volume_24h=float(item.get("quoteVolume", 0)),
+                trades_count=int(item.get("count", 0)),
+            )
+            tickers.append(ticker)
+        except (ValueError, TypeError):
+            continue
+
+    return tickers
 
 
 def build_binance_table(tickers: list[BinanceTicker]) -> pd.DataFrame:
