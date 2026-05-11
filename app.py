@@ -757,6 +757,18 @@ def render_sidebar() -> dict:
         )
 
         st.divider()
+        st.markdown("### Binance 过滤配置")
+        volume_threshold = st.slider(
+            "成交额过滤阈值（万 USDT）",
+            min_value=100,
+            max_value=10000,
+            value=500,
+            step=100,
+            help="仅显示 24h 成交额大于此阈值的交易对",
+        )
+        st.caption(f"💡 当前阈值：{volume_threshold} 万 USDT = {volume_threshold * 10000:,.0f} USDT")
+
+        st.divider()
         st.markdown("### 实时扫描")
 
         # 初始化 session state
@@ -817,6 +829,7 @@ def render_sidebar() -> dict:
         "hv_threshold": hv_threshold,
         "z_threshold": z_threshold,
         "refresh_interval": refresh_interval,
+        "volume_threshold": volume_threshold,
     }
 
 
@@ -874,8 +887,9 @@ def main() -> None:
                 tickers = st.session_state.binance_data
 
         if tickers:
-            # 核心过滤：仅保留 24h 成交额 > 500 万 USDT 的交易对
-            tickers = [t for t in tickers if t.quote_volume_24h > 5_000_000]
+            # 核心过滤：使用用户配置的成交额阈值
+            volume_threshold_usdt = config["volume_threshold"] * 10000  # 万 USDT 转换为 USDT
+            tickers = [t for t in tickers if t.quote_volume_24h > volume_threshold_usdt]
 
             # 按涨幅从高到低排序
             tickers = sorted(tickers, key=lambda t: t.price_change_pct, reverse=True)
@@ -888,7 +902,7 @@ def main() -> None:
             # 统计信息
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
-                st.metric("交易对数量", f"{len(tickers)}", "成交额 > 500万")
+                st.metric("交易对数量", f"{len(tickers)}", f"成交额 > {config['volume_threshold']}万")
             with col2:
                 gainers = len([t for t in tickers if t.price_change_pct > 0])
                 st.metric("上涨", f"{gainers}", f"{gainers/len(tickers)*100:.1f}%" if tickers else "0%")
@@ -901,7 +915,7 @@ def main() -> None:
                 st.metric("⚠️ 缩量背离", f"{divergence_count}", "风险信号")
 
             # 排序选项
-            st.info("💡 默认已按 24h 涨幅从高到低排序，且仅显示成交额 > 500 万 USDT 的交易对")
+            st.info(f"💡 默认已按 24h 涨幅从高到低排序，且仅显示成交额 > {config['volume_threshold']} 万 USDT 的交易对")
             sort_col1, sort_col2 = st.columns([3, 7])
             with sort_col1:
                 sort_by = st.selectbox(
