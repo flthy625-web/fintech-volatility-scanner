@@ -174,6 +174,9 @@ BINANCE_API_ENDPOINTS = [
     "https://api3.binance.com/api/v3/ticker/24hr",
 ]
 
+# CoinGecko API（无地区限制的备用方案）
+COINGECKO_API = "https://api.coingecko.com/api/v3/coins/markets"
+
 
 # ---------------------------------------------------------------------------
 # 数据结构
@@ -322,8 +325,9 @@ def fetch_binance_usdt_pairs() -> list[BinanceTicker]:
     """获取所有 USDT 交易对的 24h 数据，支持多个备用端点"""
     data = None
     last_error = None
+    source = "Binance"
 
-    # 尝试所有备用端点
+    # 首先尝试所有 Binance 端点
     for endpoint in BINANCE_API_ENDPOINTS:
         try:
             response = requests.get(
@@ -345,16 +349,56 @@ def fetch_binance_usdt_pairs() -> list[BinanceTicker]:
             last_error = str(e)
             continue
 
-    # 如果所有端点都失败
+    # 如果 Binance 所有端点都失败，尝试 CoinGecko
     if data is None:
-        st.error(
-            f"⚠️ Binance API 无法访问（可能是地区限制 HTTP 451）\n\n"
-            f"错误详情: {last_error}\n\n"
-            f"**解决方案：**\n"
-            f"1. 使用 VPN 切换到其他地区（如美国、日本、新加坡）\n"
-            f"2. 在 Streamlit Cloud 部署后访问（云端服务器通常无地区限制）\n"
-            f"3. 使用代理服务器"
-        )
+        st.warning("⚠️ Binance API 受地区限制，正在切换到 CoinGecko API...")
+        try:
+            response = requests.get(
+                COINGECKO_API,
+                params={
+                    "vs_currency": "usd",
+                    "order": "market_cap_desc",
+                    "per_page": 250,
+                    "page": 1,
+                    "sparkline": False,
+                    "price_change_percentage": "24h"
+                },
+                timeout=15,
+                headers={"User-Agent": "Mozilla/5.0"}
+            )
+            response.raise_for_status()
+            coingecko_data = response.json()
+
+            # 转换 CoinGecko 数据格式为 Binance 格式
+            data = []
+            for coin in coingecko_data:
+                # CoinGecko 返回的是 USD 价格，我们模拟 USDT 交易对
+                data.append({
+                    "symbol": f"{coin['symbol'].upper()}USDT",
+                    "lastPrice": coin.get("current_price", 0),
+                    "priceChangePercent": coin.get("price_change_percentage_24h", 0),
+                    "highPrice": coin.get("high_24h", 0),
+                    "lowPrice": coin.get("low_24h", 0),
+                    "volume": coin.get("total_volume", 0),
+                    "quoteVolume": coin.get("total_volume", 0),  # CoinGecko 直接给 USD 成交量
+                    "count": 10000,  # CoinGecko 不提供成交笔数，使用估算值
+                })
+            source = "CoinGecko"
+            st.success(f"✅ 已切换到 CoinGecko API，获取到 {len(data)} 个币种数据")
+
+        except requests.RequestException as e:
+            st.error(
+                f"⚠️ 所有数据源均无法访问\n\n"
+                f"Binance 错误: {last_error}\n"
+                f"CoinGecko 错误: {str(e)}\n\n"
+                f"**解决方案：**\n"
+                f"1. 使用 VPN 切换到其他地区\n"
+                f"2. 在 Streamlit Cloud 部署后访问\n"
+                f"3. 检查网络连接"
+            )
+            return []
+
+    if data is None:
         return []
 
     tickers: list[BinanceTicker] = []
