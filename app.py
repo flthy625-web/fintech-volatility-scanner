@@ -215,23 +215,36 @@ class BinanceTicker:
 
 @st.cache_data(ttl=300, show_spinner=False)
 def load_history(symbol: str, period: str, interval: str) -> pd.DataFrame:
-    """拉取历史行情，失败返回空表而非抛出。"""
-    try:
-        df = yf.download(
-            symbol,
-            period=period,
-            interval=interval,
-            progress=False,
-            auto_adjust=True,
-            threads=False,
-        )
-    except Exception:
-        return pd.DataFrame()
-    if df is None or df.empty:
-        return pd.DataFrame()
-    if isinstance(df.columns, pd.MultiIndex):
-        df.columns = df.columns.get_level_values(0)
-    df = df.dropna(how="all").copy()
+    """拉取历史行情，失败返回空表而非抛出。支持重试机制。"""
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            df = yf.download(
+                symbol,
+                period=period,
+                interval=interval,
+                progress=False,
+                auto_adjust=True,
+                threads=False,
+            )
+            if df is None or df.empty:
+                if attempt < max_retries - 1:
+                    time.sleep(1)  # 等待1秒后重试
+                    continue
+                return pd.DataFrame()
+
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            df = df.dropna(how="all").copy()
+            df.index = pd.to_datetime(df.index)
+            return df
+        except Exception as e:
+            if attempt < max_retries - 1:
+                time.sleep(1)
+                continue
+            # 最后一次尝试失败，返回空表
+            return pd.DataFrame()
+    return pd.DataFrame()
     df.index = pd.to_datetime(df.index)
     return df
 
