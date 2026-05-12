@@ -504,20 +504,19 @@ def build_binance_table(tickers: list[BinanceTicker]) -> pd.DataFrame:
 def render_hero(symbol_count: int, timeframe_label: str, is_realtime: bool = False) -> None:
     realtime_indicator = ""
     if is_realtime:
-        realtime_indicator = '<span class="chip" style="background: rgba(248, 113, 113, 0.22); border-color: #f87171; color: #f87171; animation: pulse 2s infinite;">🔴 实时扫描中</span>'
+        realtime_indicator = f'<span class="chip" style="background: rgba(248, 113, 113, 0.22); border-color: #f87171; color: #f87171; animation: pulse 2s infinite;">{t("realtime_scanning", "🔴 实时扫描中")}</span>'
 
     st.markdown(
         f"""
         <div class="hero-wrap">
-            <p class="hero-title">Fintech 市场波动扫描器</p>
+            <p class="hero-title">{t('app_title', 'Fintech 市场波动扫描器')}</p>
             <p class="hero-subtitle">
-                基于历史波动率、ATR、回撤与异常 z-score 的多资产实时扫描面板。
-                数据源 Yahoo Finance，每 5 分钟缓存一次。
+                {t('app_subtitle', '基于历史波动率、ATR、回撤与异常 z-score 的多资产实时扫描面板。数据源 Yahoo Finance，每 5 分钟缓存一次。')}
             </p>
             <div class="hero-chips">
-                <span class="chip">已加载 {symbol_count} 个标的</span>
-                <span class="chip">观察窗口 · {timeframe_label}</span>
-                <span "chip">更新时间 · {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</span>
+                <span class="chip">{t('loaded_symbols', '已加载 {count} 个标的').format(count=symbol_count)}</span>
+                <span class="chip">{t('observation_window', '观察窗口')} · {timeframe_label}</span>
+                <span class="chip">{t('update_time', '更新时间')} · {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</span>
                 {realtime_indicator}
             </div>
         </div>
@@ -560,27 +559,27 @@ def render_summary_cards(stats_list: list[VolStats]) -> None:
 
     cards = [
         render_metric_card(
-            "平均年化波动率",
+            t('metric_avg_volatility', '平均年化波动率'),
             f"{avg_hv:.1f}%",
-            f"{len(stats_list)} 个标的均值",
+            t('metric_period_mean', '{count} 个标的均值').format(count=len(stats_list)),
             "flat",
         ),
         render_metric_card(
-            "平均最大回撤",
+            t('metric_avg_drawdown', '平均最大回撤'),
             f"{avg_dd:.1f}%",
-            "基于区间收盘价",
+            t('metric_interval_close', '基于区间收盘价'),
             "down" if avg_dd < -5 else "flat",
         ),
         render_metric_card(
-            "单日最大变动",
+            t('metric_max_change', '单日最大变动'),
             f"{top_mover.pct_change_1d:+.2f}%",
             top_mover.symbol,
             "up" if top_mover.pct_change_1d >= 0 else "down",
         ),
         render_metric_card(
-            "异常波动标的",
+            t('metric_anomaly_count', '异常波动标的'),
             f"{len(extreme)}",
-            "|z-score| ≥ 2",
+            t('metric_zscore_threshold', '|z-score| ≥ 2'),
             "down" if extreme else "flat",
         ),
     ]
@@ -950,10 +949,10 @@ def main() -> None:
     render_hero(len(config["symbols"]), config["timeframe_label"], is_realtime)
 
     if not config["symbols"]:
-        st.warning("请在左侧输入至少一个有效标的。")
+        st.warning(t('input_symbol', '请在左侧输入至少一个有效标的。'))
         return
 
-    with st.spinner("正在拉取并计算各标的波动指标…"):
+    with st.spinner(t('loading_volatility', '正在拉取并计算各标的波动指标…')):
         stats_list, histories = scan_universe(
             config["symbols"], config["period"], config["interval"]
         )
@@ -971,19 +970,19 @@ def main() -> None:
     st.divider()
     col_btn1, col_btn2, col_btn3 = st.columns([2, 2, 6])
     with col_btn1:
-        if st.button("📊 获取 Binance USDT 交易对", use_container_width=True, type="primary"):
+        if st.button(t('get_binance_data', '📊 获取 Binance USDT 交易对'), use_container_width=True, type="primary"):
             st.session_state.show_binance = True
             st.session_state.binance_data = None  # 清除旧数据
     with col_btn2:
-        if st.button("🔄 刷新 Binance 数据", use_container_width=True):
+        if st.button(t('refresh_binance', '🔄 刷新 Binance 数据'), use_container_width=True):
             st.cache_data.clear()
             st.session_state.binance_data = None
 
     # 显示 Binance 数据
     if st.session_state.get("show_binance", False):
-        st.markdown('<div class="section-title">Binance USDT 交易对 24h 数据</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-title">{t("binance_24h_data", "Binance USDT 交易对 24h 数据")}</div>', unsafe_allow_html=True)
 
-        with st.spinner("正在从 Binance API 获取数据..."):
+        with st.spinner(t('loading_binance', '正在从 Binance API 获取数据...')):
             if st.session_state.get("binance_data") is None:
                 tickers = fetch_binance_usdt_pairs()
                 st.session_state.binance_data = tickers
@@ -1078,38 +1077,39 @@ def main() -> None:
     st.divider()
 
     tab_scan, tab_detail, tab_corr, tab_alerts = st.tabs(
-        ["扫描全景", "单标的详情", "相关性矩阵", "告警"]
+        [t('tab_scan', '扫描全景'), t('tab_detail', '单标的详情'),
+         t('tab_correlation', '相关性矩阵'), t('tab_alerts', '告警')]
     )
 
     with tab_scan:
-        st.markdown('<div class="section-title">多资产波动扫描</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-title">{t("section_multi_scan", "多资产波动扫描")}</div>', unsafe_allow_html=True)
         table = build_scanner_table(stats_list)
         if table.empty:
-            st.info("没有成功获取到任何标的数据。")
+            st.info(t('no_data_fetched', '没有成功获取到任何标的数据。'))
         else:
             render_scanner_table(table.sort_values("年化波动率%", ascending=False))
             st.download_button(
-                "下载当前扫描结果 CSV",
+                t('download_csv', '下载当前扫描结果 CSV'),
                 data=table.to_csv(index=False).encode("utf-8-sig"),
                 file_name=f"vol_scan_{datetime.now():%Y%m%d_%H%M}.csv",
                 mime="text/csv",
             )
 
     with tab_detail:
-        st.markdown('<div class="section-title">单标的走势与滚动波动率</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-title">{t("section_detail", "单标的走势与滚动波动率")}</div>', unsafe_allow_html=True)
         available = [s.symbol for s in stats_list]
         if not available:
-            st.info("无可用标的。")
+            st.info(t('no_available_symbol', '无可用标的。'))
         else:
-            chosen = st.selectbox("选择标的", options=available, index=0)
+            chosen = st.selectbox(t('select_symbol', '选择标的'), options=available, index=0)
             render_volatility_chart(chosen, histories.get(chosen, pd.DataFrame()), config["interval"])
 
     with tab_corr:
-        st.markdown('<div class="section-title">标的收益率相关性</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-title">{t("section_correlation", "标的收益率相关性")}</div>', unsafe_allow_html=True)
         render_correlation_heatmap(histories)
 
     with tab_alerts:
-        st.markdown('<div class="section-title">阈值告警</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-title">{t("section_alerts", "阈值告警")}</div>', unsafe_allow_html=True)
         render_alerts(stats_list, config["hv_threshold"], config["z_threshold"])
 
 
