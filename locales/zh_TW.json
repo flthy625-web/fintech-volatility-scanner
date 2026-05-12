@@ -1,0 +1,77 @@
+{
+    "app_title": "Fintech 市場波動掃描器",
+    "app_subtitle": "基於歷史波動率、ATR、回撤與異常 z-score 的多資產即時掃描面板",
+    "learning_center": "學習中心",
+    "market_scan": "市場掃描",
+    "knowledge_test": "知識測驗",
+    "personal_center": "個人中心",
+
+    "language": "語言",
+    "select_language": "選擇語言",
+
+    "scan_config": "掃描配置",
+    "a": "資產預設",
+    "timeframe": "時間窗口",
+    "alert_threshold": "告警閾值",
+    "volatility_threshold": "年化波動率閾值 (%)",
+    "zscore_threshold": "|Z-Score| 閾值",
+
+    "binance_filter": "Binance 過濾配置",
+    "volume_threshold": "成交額過濾閾值（萬 USDT）",
+    "current_threshold": "當前閾值",
+
+    "realtime_scan": "即時掃描",
+    "start_scan": "開始即時掃描",
+    "stop_scan": "停止掃描",
+    "manual_refresh": "手動刷新",
+    "refresh_interval": "刷新間隔（秒）",
+    "scan_count": "已掃描",
+    "times": "次",
+
+    "get_binance_data": "獲取 Binance USDT 交易對",
+    "refresh_binance": "刷新 Binance 數據",
+
+    "trading_pairs": "交易對數量",
+    "rising": "上漲",
+    "falling": "下跌",
+    "volume_surge": "放量上漲",
+    "volume_divergence": "縮量背離",
+
+    "sort_by": "排序依據",
+    "keep_default": "保持默認(漲幅)",
+    "filter": "篩選",
+    "all": "全部",
+    "only_rising": "僅上漲",
+    "only_falling": "僅下跌",
+
+    "download_csv": "下載當前掃描結果 CSV",
+    "download_binance_csv": "下載 Binance 數據 CSV",
+
+    "data_source": "數據來源：Yahoo Finance · 僅供研究參考，不構成投資建議。",
+
+    "concepts": {
+        "liquidity": "流動性",
+        "volatility": "波動率",
+        "price_discovery": "價格發現",
+        "volume_price": "量價關係",
+        "anomaly_detection": "異常檢測",
+        "risk_management": "風險管理"
+    },
+
+    "learning": {
+        "title": "金融知識庫",
+        "subtitle": "系統學習金融市場核心概念",
+        "progress": "學習進度",
+        "completed": "已完成",
+        "mark_complete": "完成",
+        "relearn": "重新學習",
+        "definition": "定義",
+        "indicators": "指標",
+        "principles": "原則",
+        "methods": "方法",
+        "application": "實戰應用",
+        "case": "案例",
+        "suggestions": "學習建議",
+        "next_steps": "下一步"
+    }
+}

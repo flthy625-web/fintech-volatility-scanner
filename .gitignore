@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# 虚拟环境
+venv/
+env/
+
+# macOS
+.DS_Store
+*.app/
+
+# IDE
+.vscode/
+.idea/
+
+# 临时文件
+*.log
+*.tmp

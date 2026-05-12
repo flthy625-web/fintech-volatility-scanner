@@ -1,0 +1,77 @@
+{
+    "app_title": "Fintech Market Volatility Scanner",
+    "app_subtitle": "Multi-asset real-time scanning panel based on historical volatility, ATR, drawdown and anomaly z-score",
+    "learning_center": "Learning Center",
+    "market_scan": "Market Scan",
+    "knowledge_test": "Knowledge Test",
+    "personal_center": "Personal Center",
+
+    "language": "Language",
+    "select_language": "Select Language",
+
+    "scan_config": "Scan Configuration",
+    "asset_preset": "Asset Preset",
+    "timeframe": "Timeframe",
+    "alert_threshold": "Alert Threshold",
+    "volatility_threshold": "Annualized Volatility Threshold (%)",
+    "zscore_threshold": "|Z-Score| Threshold",
+
+    "binance_filter": "Binance Filter Configuration",
+    "volume_threshold": "Volume Filter Threshold (10K USDT)",
+    "current_threshold": "Current Threshold",
+
+    "realtime_scan": "Real-time Scan",
+    "start_scan": "Start Real-time Scan",
+    "stop_scan": "Stop Scan",
+    "manual_refresh": "Manual Refresh",
+    "refresh_interval": "Refresh Interval (seconds)",
+    "scan_count": "Scanned",
+    "times": "times",
+
+    "get_binance_data": "Get Binance USDT Pairs",
+    "refresh_binance": "Refresh Binance Data",
+
+    "trading_pairs": "Trading Pairs",
+    "rising": "Rising",
+    "falling": "Falling",
+    "volume_surge": "Volume Surge",
+    "volume_divergence": "Volume Divergence",
+
+    "sort_by": "Sort By",
+    "keep_default": "Keep Default (Change%)",
+    "filter": "Filter",
+    "all": "All",
+    "only_rising": "Rising Only",
+    "only_falling": "Falling Only",
+
+    "download_csv": "Download Current Scan Results CSV",
+    "download_binance_csv": "Download Binance Data CSV",
+
+    "data_source": "Data Source: Yahoo Finance. For research purposes only, not investment advice.",
+
+    "concepts": {
+        "liquidity": "Liquidity",
+        "volatility": "Volatility",
+        "price_discovery": "Price Discovery",
+        "volume_price": "Volume-Price Relationship",
+        "anomaly_detection": "Anomaly Detection",
+        "risk_management": "Risk Management"
+    },
+
+    "learning": {
+        "title": "Financial Knowledge Base",
+        "subtitle": "Systematically learn core financial market concepts",
+        "progress": "Learning Progress",
+        "completed": "Completed",
+        "mark_complete": "Complete",
+        "relearn": "Relearn",
+        "definition": "Definition",
+        "indicators": "Indicators",
+        "principles": "Principles",
+        "methods": "Methods",
+        "application": "Practical Application",
+        "case": "Case Study",
+        "suggestions": "Learning Suggestions",
+        "next_steps": "Next Steps"
+    }
+}

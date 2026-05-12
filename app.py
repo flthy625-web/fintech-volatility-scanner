@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import math
+import sys
 import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Iterable
 
 import numpy as np
@@ -14,6 +16,10 @@ import requests
 import streamlit as st
 import yfinance as yf
 from plotly.subplots import make_subplots
+
+# 添加模块路径
+sys.path.insert(0, str(Path(__file__).parent))
+from modules.i18n import t, render_language_selector, get_current_language
 
 # ---------------------------------------------------------------------------
 # 页面与全局样式
@@ -820,10 +826,14 @@ def render_binance_table(df: pd.DataFrame) -> None:
 
 def render_sidebar() -> dict:
     with st.sidebar:
-        st.markdown("### 扫描配置")
+        # 语言选择器（最顶部）
+        render_language_selector()
+        st.divider()
+
+        st.markdown(f"### {t('scan_config', '扫描配置')}")
 
         preset_name = st.selectbox(
-            "资产预设",
+            t('asset_preset', '资产预设'),
             options=list(PRESETS.keys()),
             index=0,
             help="选择预设标的组合，或在下方自行编辑列表。",

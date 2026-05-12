@@ -1,0 +1,77 @@
+{
+    "app_title": "Fintech 市场波动扫描器",
+    "app_subtitle": "基于历史波动率、ATR、回撤与异常 z-score 的多资产实时扫描面板",
+    "learning_center": "学习中心",
+    "market_scan": "市场扫描",
+    "knowledge_test": "知识测验",
+    "personal_center": "个人中心",
+
+    "language": "语言",
+    "select_language": "选择语言",
+
+    "scan_config": "扫描配置",
+    "asset_preset": "资产预设",
+    "timeframe": "时间窗口",
+    "alert_threshold": "告警阈值",
+    "volatility_threshold": "年化波动率阈值 (%)",
+    "zscore_threshold": "|Z-Score| 阈值",
+
+    "binance_filter": "Binance 过滤配置",
+    "volume_threshold": "成交额过滤阈值（万 USDT）",
+    "current_threshold": "当前阈值",
+
+    "realtime_scan": "实时扫描",
+    "start_scan": "开始实时扫描",
+    "stop_scan": "停止扫描",
+    "manual_refresh": "手动刷新",
+    "refresh_interval": "刷新间隔（秒）",
+    "scan_count": "已扫描",
+    "times": "次",
+
+    "get_binance_data": "获取 Binance USDT 交易对",
+    "refresh_binance": "刷新 Binance 数据",
+
+    "trading_pairs": "交易对数量",
+    "rising": "上涨",
+    "falling": "下跌",
+    "volume_surge": "放量上涨",
+    "volume_divergence": "缩量背离",
+
+    "sort_by": "排序依据",
+    "keep_default": "保持默认(涨幅)",
+    "filter": "筛选",
+    "all": "全部",
+    "only_rising": "仅上涨",
+    "only_falling": "仅下跌",
+
+    "download_csv": "下载当前扫描结果 CSV",
+    "download_binance_csv": "下载 Binance 数据 CSV",
+
+    "data_source": "数据来源：Yahoo Finance · 仅供研究参考，不构成投资建议。",
+
+    "concepts": {
+        "liquidity": "流动性",
+        "volatility": "波动率",
+        "price_discovery": "价格发现",
+        "volume_price": "量价关系",
+        "anomaly_detection": "异常检测",
+        "risk_management": "风险管理"
+    },
+
+    "learning": {
+        "title": "金融知识库",
+        "subtitle": "系统学习金融市场核心概念",
+        "progress": "学习进度",
+        "completed": "已完成",
+        "mark_complete": "完成",
+        "relearn": "重新学习",
+        "definition": "定义",
+        "indicators": "指标",
+        "principles": "原则",
+        "methods": "方法",
+        "application": "实战应用",
+        "case": "案例",
+        "suggestions": "学习建议",
+        "next_steps": "下一步"
+    }
+}
